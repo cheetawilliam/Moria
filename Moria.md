@@ -17,6 +17,7 @@ ride gates
 
 Files:
 Moria.md
+TicketMachine.py
 
 Libraries used:
 WxPython and dependencies
