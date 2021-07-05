@@ -18,6 +18,8 @@ ride gates
 Files:
 Moria.md
 TicketMachine.py
+Databaseinit.py
+Moriadata.txt
 
 Libraries used:
 WxPython and dependencies
@@ -25,3 +27,13 @@ WxPython and dependencies
 Programs used:
 Geany
 Wireframe
+
+orderfile library structure
+|\Ordernumber
+||Date ordered
+||Date visit
+||Price
+||\Ticketnumber
+|||date visit
+|||age
+|||QR-code

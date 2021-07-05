@@ -6,6 +6,7 @@
 #Importing Requirements
 import wx #WX Python, GUI
 from wx.adv import DatePickerCtrl
+import json
 
 class Moria(wx.Frame):
     """
@@ -92,6 +93,8 @@ class Moria(wx.Frame):
             self.num17tick = 0
             self.num64tick = 0
             self.num65tick = 0
+            #Set default price to 0
+            self.price = 0
             #self.date = wx.DateTime.Now()
             returning = False
         elif self.page == 2:            
@@ -217,8 +220,6 @@ class Moria(wx.Frame):
         #Set Font to age65+
         self.text4.SetFont(font)
         
-        #Set default price to 0
-        self.price = 0
         #Detect change in amount tickets and calculate price.
         self.counter17.Bind(wx.EVT_SPINCTRL, self.calcprice)
         self.counter64.Bind(wx.EVT_SPINCTRL, self.calcprice)
@@ -293,7 +294,6 @@ class Moria(wx.Frame):
             self.counter64.SetValue(self.num64tick)
             self.counter65.SetValue(self.num65tick)
             #Set date to old value
-            print(self.date)
             if self.date != self.controldate:
                 self.calendar.SetValue(self.date)
             
@@ -344,12 +344,12 @@ class Moria(wx.Frame):
         self.displaydate = self.displaydate.split()
         #Confirmation text
         confirmationtext = ("Thank you for braving the deapths of Moria please "
-        "confirm all information has been entered correctly. \n"
+        "confirm all information has been entered correctly. \n\n"
         "You're welcome on: " + str(self.displaydate[0]) + "\n" +
         str(self.num17tick) + " tickets for people under 18.\n" +
         str(self.num64tick) + " tickets for people under 65.\n" +
         str(self.num65tick) + " tickets for people at or over 65.\n" +
-        "The total cost will come to €" + str(self.price) + ",-\n"
+        "The total cost will come to €" + str(self.price) + ",-\n\n"
         "If this all is correct we hope to see you soon, "
         "If not please return to the previous page.")
         #Make conformation information
@@ -397,13 +397,15 @@ class Moria(wx.Frame):
         screensizing = self.screensizer()
         #Unpack result screensizer function
         width, height = screensizing
+        #Save the order to file.
+            
         #Empty last page
         for child in self.panel.GetChildren():
             child.Destroy()
         
         #Create fakepaying button
         self.fakepaybutton = wx.Button(self.panel, id=wx.ID_ANY, 
-            label="Change Tickets")
+            label="'pay' Tickets", pos=(width/2, height/2))
         #Make background black and letters white.
         self.fakepaybutton.SetBackgroundColour("white")
         self.fakepaybutton.SetForegroundColour("black")  
@@ -411,6 +413,28 @@ class Moria(wx.Frame):
         self.fakepaybutton.Bind(wx.EVT_BUTTON, self.page4)
     
     def page4(self, event):
+        #Create dictionary for order.
+        order = {
+            "dateordered" : self.controldate,
+            "price" : self.price,
+        }
+        #Add up number of tickets
+        self.numticks = self.num17tick+self.num64tick+self.num65tick
+        self.tick = 0
+        while self.tick != self.numticks:
+            if self.tick < self.num17tick:
+                age = 17
+            elif self.tick < (self.num17tick+self.num64tick):
+                age = 64
+            else:
+                age = 65
+
+            order[self.tick] = {
+                "datevisit" : self.displaydate,
+                "age" : age,
+                "qr" : ""
+            }
+            self.tick += 1
         #Set page and refresh
         self.page = 4
         self.Refresh()
